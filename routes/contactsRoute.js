@@ -146,60 +146,36 @@ router.post('/update/:id', protectedRoute, async(req, res) => {
 router.post('/createContact', protectedRoute, async(req, res) => {
     // Creating a contact using try catch block 
     try {
-        // Searching the contacts data base to see if a contact with 
-        // the first name already exists 
-        let contacts = await CONTACTS.find({
-            firstname: req.body.firstname
-        });
+        // Getting the email address from the json web token 
+        const tokenHeader = req.header('x-auth-token');
+        
+        // Getting the jwt key 
+        const jwtKey = process.env.jwtKey; 
 
+        // Decode the token 
+        let isMatched = jwt.decode(tokenHeader, jwtKey); 
 
-        // If the contacts exits on the database execute the 
-        // block of code below 
-        if (contacts.length >= 1) {
-            // Create an error message 
-            let errorMessage = JSON.stringify({
-                "message": "Contact with the firstname exists", 
-                "status": "contacts-exist-on-db", 
-                "statusCode": 404, 
-            })
+        // Save the contact 
+        const newContact = new CONTACTS({
+            emailAddress: isMatched.email, 
+            firstname: req.body.firstname, 
+            lastname: req.body.lastname, 
+            phoneNumber: req.body.phoneNumber, 
+        })
 
-            // Sending the error message 
-            return res.send(errorMessage); 
-        }
+        // Saving the new contacts on the database 
+        await newContact.save(); 
 
-        // Else if the contacts does not exist 
-        else {
-            // Getting the email address from the json web token 
-            const tokenHeader = req.header('x-auth-token');
-            
+        // Generating a success message 
+        let successMessage = JSON.stringify({
+            "message": "Contact newly saved", 
+            "status": 'success', 
+            "statusCode": 200
+        })
 
-            // Getting the jwt key 
-            const jwtKey = process.env.jwtKey; 
-
-            // Decode the token 
-            let isMatched = jwt.decode(tokenHeader, jwtKey); 
-
-            // Save the contact 
-            const newContact = new CONTACTS({
-                emailAddress: isMatched.email, 
-                firstname: req.body.firstname, 
-                lastname: req.body.lastname, 
-                phoneNumber: req.body.phoneNumber, 
-            })
-
-            // Saving the new contacts on the database 
-            await newContact.save(); 
-
-            // Generating a success message 
-            let successMessage = JSON.stringify({
-                "message": "Contact newly saved", 
-                "status": 'success', 
-                "statusCode": 200
-            })
-
-            // Return the success message 
-            return res.send(successMessage); 
-        }
+        // Return the success message 
+        return res.send(successMessage); 
+        
     }
 
     // Catch the error 
