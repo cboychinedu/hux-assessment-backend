@@ -10,8 +10,17 @@ const userSchema = new mongodb.Schema({
     date: { type: Date, default: Date.now}
 })
 
+// Creating a schema for the contacts 
+const contactsSchema = new mongodb.Schema({
+   emailAddress: { type: String}, 
+   firstname: {type: String}, 
+   lastname: { type: String }, 
+   phoneNumber: { type: String },  
+})
+
 // Creating the user collection 
-const USERS = mongodb.model('users', userSchema); 
+const USERS = mongodb.model('users', userSchema);
+const CONTACTS = mongodb.model('contacts', contactsSchema);  
 
 // Exporting the modules 
-module.exports = { USERS }
+module.exports = { USERS, CONTACTS }

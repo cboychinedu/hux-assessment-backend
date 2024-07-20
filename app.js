@@ -30,7 +30,7 @@ require('dotenv').config();
 // );
 
 // Setting the data base URI
-const databaseURI = "mongodb://localhost:27017/shawarma_app";
+const databaseURI = "mongodb://localhost:27017/hux_app";
 
 // Saving the session into mongodb database 
 const store = new mongodbSession({
@@ -39,7 +39,10 @@ const store = new mongodbSession({
 }); 
 
 // Connecting to the mongodb database
-mongodb.connect(databaseURI).then(() => {
+mongodb.connect(databaseURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
     // Connection details
     let databaseMessage = chalk.green("Connected to mongodb database server.")
     console.log(databaseMessage);
@@ -95,14 +98,16 @@ app.use(morgan('combined', { stream: accessLogStream }));
 
 // Using the environment variable for the HOST, and PORT 
 const PORT = process.env.PORT || 3001; 
-const HOST = process.env.serverIpAddress || 'localhost'; 
+const HOST = 'localhost'; 
 
 // Importing the required routes 
 const home = require('./routes/homeRoute'); 
+const contacts = require('./routes/contactsRoute'); 
 
 
 // Setting the routes configurations 
 app.use('/', home); 
+app.use('/contact', contacts)
 
 
 // Running the nodejs server 
