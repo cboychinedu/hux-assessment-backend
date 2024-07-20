@@ -9,7 +9,72 @@ const { CONTACTS } = require('../model/model');
 const router = express.Router(); 
 
 // Getting the jwt key 
-const jwtKey = process.env.jwtKey; 
+const jwtKey = process.env.jwtKey;
+
+// Updating a contact 
+router.post('/:id', async(req, res) => {
+    // Using try catch block 
+    try {
+        // Getting the firstname, lastname, and phoneNumber 
+        const { firstname, lastname, phoneNumber } = req.body; 
+
+        const contact = await CONTACTS.findOne({
+            "_id": req.params.id, 
+        })
+
+        // Updating the contact 
+        const contactData = await CONTACTS.findOneAndUpdate({
+            "_id": req.params.id
+        }, {
+            $set: {
+                firstname: firstname || contact.firstname, 
+                lastname: lastname || contact.lastname, 
+                phoneNumber: phoneNumber || contact.phoneNumber, 
+            }
+        }); 
+
+        // If the contact data exists on the database, execute the block 
+        // of code below 
+        if (contactData) {
+            // Creating a success message 
+            let successMessage = JSON.stringify({
+                "message": "User information changed", 
+                "status": "success", 
+                "statusCode": 200, 
+            }); 
+
+            // Sending back the success message 
+            return res.send(successMessage); 
+        }
+
+        // Else 
+        else {
+            // Creating an error message 
+            let errorMessage = JSON.stringify({
+                "message": "User information not found", 
+                "status": "error", 
+                "statusCode": 404, 
+            })
+
+            // Sending the error message 
+            return res.send(errorMessage); 
+        }
+    }
+
+    // Catch the error 
+    catch (error) {
+        // Creating the error message
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(),
+            "status": "error",
+            "statusCode": 500,
+        });
+
+        // Sending back the success message
+        return res.send(errorMessage).status(500);
+
+    }
+})
 
 // Creating a route for creating contacts 
 router.post('/createContact', async(req, res) => {
