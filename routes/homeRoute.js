@@ -125,6 +125,19 @@ router.post('/login', async(req, res) => {
                 // Sending back the error message 
                 return res.send(successMessage); 
             }
+
+            // Else 
+            else {
+                // Create the error message 
+                let errorMessage = JSON.stringify({
+                    "message": "Invalid email or password", 
+                    "status": "error", 
+                    "statusCode": 401, 
+                })
+
+                // Sending the error message 
+                return res.send(errorMessage); 
+            }
  
         }
 
