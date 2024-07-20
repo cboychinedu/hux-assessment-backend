@@ -3,7 +3,7 @@ require('dotenv').config()
 const express = require('express'); 
 const jwt = require('jsonwebtoken'); 
 const path = require('path'); 
-const { CONTACTS } = require('../model/model'); 
+const { CONTACTS, USER } = require('../model/model'); 
 
 // Creating the router object 
 const router = express.Router(); 
