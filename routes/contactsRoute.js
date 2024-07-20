@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express'); 
 const jwt = require('jsonwebtoken'); 
 const path = require('path'); 
+const protectedRoute  = require('../auth/auth'); 
 const { CONTACTS, USER } = require('../model/model'); 
 
 // Creating the router object 
@@ -12,7 +13,7 @@ const router = express.Router();
 const jwtKey = process.env.jwtKey;
 
 // Creating a route for retrieving a list of contacts 
-router.get('/', async(req, res) => {
+router.get('/', protectedRoute, async(req, res) => {
     // Using try catch block to get all contacts 
     try {
         // Getting the email address from the json web token 
@@ -76,7 +77,7 @@ router.get('/', async(req, res) => {
 
 
 // Updating a contact 
-router.post('/update/:id', async(req, res) => {
+router.post('/update/:id', protectedRoute, async(req, res) => {
     // Using try catch block 
     try {
         // Getting the firstname, lastname, and phoneNumber 
@@ -142,7 +143,7 @@ router.post('/update/:id', async(req, res) => {
 
 
 // Creating a route for creating contacts 
-router.post('/createContact', async(req, res) => {
+router.post('/createContact', protectedRoute, async(req, res) => {
     // Creating a contact using try catch block 
     try {
         // Searching the contacts data base to see if a contact with 
@@ -218,7 +219,7 @@ router.post('/createContact', async(req, res) => {
 })
 
 // Creating a route for deleting a single contact 
-router.post('/delete/:id', async (req, res) => {
+router.post('/delete/:id', protectedRoute, async (req, res) => {
     // USing try catch block 
     try {
         // Getting the contact from the specified id value 
