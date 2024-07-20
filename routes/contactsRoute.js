@@ -11,146 +11,6 @@ const router = express.Router();
 // Getting the jwt key 
 const jwtKey = process.env.jwtKey;
 
-// Updating a contact 
-router.post('/:id', async(req, res) => {
-    // Using try catch block 
-    try {
-        // Getting the firstname, lastname, and phoneNumber 
-        const { firstname, lastname, phoneNumber } = req.body; 
-
-        const contact = await CONTACTS.findOne({
-            "_id": req.params.id, 
-        })
-
-        // Updating the contact 
-        const contactData = await CONTACTS.findOneAndUpdate({
-            "_id": req.params.id
-        }, {
-            $set: {
-                firstname: firstname || contact.firstname, 
-                lastname: lastname || contact.lastname, 
-                phoneNumber: phoneNumber || contact.phoneNumber, 
-            }
-        }); 
-
-        // If the contact data exists on the database, execute the block 
-        // of code below 
-        if (contactData) {
-            // Creating a success message 
-            let successMessage = JSON.stringify({
-                "message": "User information changed", 
-                "status": "success", 
-                "statusCode": 200, 
-            }); 
-
-            // Sending back the success message 
-            return res.send(successMessage); 
-        }
-
-        // Else 
-        else {
-            // Creating an error message 
-            let errorMessage = JSON.stringify({
-                "message": "User information not found", 
-                "status": "error", 
-                "statusCode": 404, 
-            })
-
-            // Sending the error message 
-            return res.send(errorMessage); 
-        }
-    }
-
-    // Catch the error 
-    catch (error) {
-        // Creating the error message
-        let errorMessage = JSON.stringify({
-            "message": error.toString().trim(),
-            "status": "error",
-            "statusCode": 500,
-        });
-
-        // Sending back the success message
-        return res.send(errorMessage).status(500);
-
-    }
-})
-
-// Creating a route for creating contacts 
-router.post('/createContact', async(req, res) => {
-    // Creating a contact using try catch block 
-    try {
-        // Searching the contacts data base to see if a contact with 
-        // the first name already exists 
-        let contacts = await CONTACTS.findOne({
-            firstname: req.body.firstname
-        }); 
-
-
-        // If the contacts exits on the database execute the 
-        // block of code below 
-        if (contacts) {
-            // Create an error message 
-            let errorMessage = JSON.stringify({
-                "message": "Contact with the firstname exists", 
-                "status": "contacts-exist-on-db", 
-                "statusCode": 404, 
-            })
-
-            // Sending the error message 
-            return res.send(errorMessage); 
-        }
-
-        // Else if the contacts does not exist 
-        else {
-            // Getting the email address from the json web token 
-            const tokenHeader = req.header('x-auth-token');  
-
-            // Getting the jwt key 
-            const jwtKey = process.env.jwtKey; 
-
-            // Decode the token 
-            let isMatched = jwt.decode(tokenHeader, jwtKey); 
-
-            // Save the contact 
-            const newContact = new CONTACTS({
-                emailAddress: isMatched.email, 
-                firstname: req.body.firstname, 
-                lastname: req.body.lastname, 
-                phoneNumber: req.body.phoneNumber, 
-            })
-
-            // Saving the new contacts on the database 
-            await newContact.save(); 
-
-            // Generating a success message 
-            let successMessage = JSON.stringify({
-                "message": "Contact newly saved", 
-                "status": 'success', 
-                "statusCode": 200
-            })
-
-            // Return the success message 
-            return res.send(successMessage); 
-        }
-    }
-
-    // Catch the error 
-    catch (error) {
-        // Execute this command if error was found while creating 
-        // the cart 
-        let errorMessage = JSON.stringify({
-            "message": error.toString().trim(), 
-            "status": "error", 
-            "statusCode": 404, 
-        }); 
-
-        // sending back the error message 
-        return res.send(errorMessage); 
-
-    }
-})
-
 // Creating a route for retrieving a list of contacts 
 router.get('/', async(req, res) => {
     // Using try catch block to get all contacts 
@@ -214,10 +74,198 @@ router.get('/', async(req, res) => {
     }
 })
 
-// Creating a route for retrieving a single contact 
-router.post('/:id', async(req, res) => {
+
+// Updating a contact 
+router.post('/update/:id', async(req, res) => {
+    // Using try catch block 
+    try {
+        // Getting the firstname, lastname, and phoneNumber 
+        const { firstname, lastname, phoneNumber } = req.body; 
+
+        const contact = await CONTACTS.findOne({
+            "_id": req.params.id, 
+        })
+
+        // Updating the contact 
+        const contactData = await CONTACTS.findOneAndUpdate({
+            "_id": req.params.id
+        }, {
+            $set: {
+                firstname: firstname || contact.firstname, 
+                lastname: lastname || contact.lastname, 
+                phoneNumber: phoneNumber || contact.phoneNumber, 
+            }
+        }); 
+
+        // If the contact data exists on the database, execute the block 
+        // of code below 
+        if (contactData) {
+            // Creating a success message 
+            let successMessage = JSON.stringify({
+                "message": "User information changed", 
+                "status": "success", 
+                "statusCode": 200, 
+            }); 
+
+            // Sending back the success message 
+            return res.send(successMessage); 
+        }
+
+        // Else 
+        else {
+            // Creating an error message 
+            let errorMessage = JSON.stringify({
+                "message": "User information not found", 
+                "status": "error", 
+                "statusCode": 404, 
+            })
+
+            // Sending the error message 
+            return res.send(errorMessage); 
+        }
+    }
+
+    // Catch the error 
+    catch (error) {
+        // Creating the error message
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(),
+            "status": "error",
+            "statusCode": 500,
+        });
+
+        // Sending back the success message
+        return res.send(errorMessage).status(500);
+
+    }
+})
 
 
+// Creating a route for creating contacts 
+router.post('/createContact', async(req, res) => {
+    // Creating a contact using try catch block 
+    try {
+        // Searching the contacts data base to see if a contact with 
+        // the first name already exists 
+        let contacts = await CONTACTS.find({
+            firstname: req.body.firstname
+        });
+
+
+        // If the contacts exits on the database execute the 
+        // block of code below 
+        if (contacts.length >= 1) {
+            // Create an error message 
+            let errorMessage = JSON.stringify({
+                "message": "Contact with the firstname exists", 
+                "status": "contacts-exist-on-db", 
+                "statusCode": 404, 
+            })
+
+            // Sending the error message 
+            return res.send(errorMessage); 
+        }
+
+        // Else if the contacts does not exist 
+        else {
+            // Getting the email address from the json web token 
+            const tokenHeader = req.header('x-auth-token');
+            
+
+            // Getting the jwt key 
+            const jwtKey = process.env.jwtKey; 
+
+            // Decode the token 
+            let isMatched = jwt.decode(tokenHeader, jwtKey); 
+
+            // Save the contact 
+            const newContact = new CONTACTS({
+                emailAddress: isMatched.email, 
+                firstname: req.body.firstname, 
+                lastname: req.body.lastname, 
+                phoneNumber: req.body.phoneNumber, 
+            })
+
+            // Saving the new contacts on the database 
+            await newContact.save(); 
+
+            // Generating a success message 
+            let successMessage = JSON.stringify({
+                "message": "Contact newly saved", 
+                "status": 'success', 
+                "statusCode": 200
+            })
+
+            // Return the success message 
+            return res.send(successMessage); 
+        }
+    }
+
+    // Catch the error 
+    catch (error) {
+        // Execute this command if error was found while creating 
+        // the cart 
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(), 
+            "status": "error", 
+            "statusCode": 404, 
+        }); 
+
+        // sending back the error message 
+        return res.send(errorMessage); 
+
+    }
+})
+
+// Creating a route for deleting a single contact 
+router.delete('/:id', async (req, res) => {
+    // USing try catch block 
+    try {
+        // Getting the contact from the specified id value 
+        const contact = await CONTACTS.findOneAndDelete({
+            _id: req.params.id, 
+        })
+
+        // IF the contact is found 
+        if (contact) {
+            // Create a success message 
+            let successMessage = JSON.stringify({
+                "message": "Contact deleted successfully", 
+                "status": "success", 
+                "statusCode": 200, 
+            }); 
+
+            // sending the success message 
+            return res.send(successMessage); 
+        }
+
+        // else if the contact was not found 
+        else {
+            // Create and error message 
+            let errorMessage = JSON.stringify({
+                "message": "Contact not found", 
+                "status": "error", 
+                "statusCode": 404, 
+            }); 
+
+            // Sending the error message 
+            return res.send(errorMessage); 
+        }
+    }
+
+    // Catch the error 
+    catch (error) {
+        // Creating the error message
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(),
+            "status": "error",
+            "statusCode": 500,
+        });
+
+        // Sending back the success message
+        return res.send(errorMessage).status(500);
+
+    }
 })
 
 // Exporting the contact route 
