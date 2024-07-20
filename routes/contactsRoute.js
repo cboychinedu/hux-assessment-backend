@@ -218,7 +218,7 @@ router.post('/createContact', async(req, res) => {
 })
 
 // Creating a route for deleting a single contact 
-router.delete('/:id', async (req, res) => {
+router.post('/delete/:id', async (req, res) => {
     // USing try catch block 
     try {
         // Getting the contact from the specified id value 
