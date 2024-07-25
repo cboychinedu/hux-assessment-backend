@@ -16,7 +16,7 @@ const protectedRoute = async (req, res, next) => {
         const jwtKey = process.env.jwtKey; 
 
         // Verify the jsonweb token 
-        let isMatched = jwt.decode(tokenHeader, jwtKey); 
+        let isMatched = jwt.decode(tokenHeader, jwtKey);  
 
         // if the user's is logged in 
         if (isMatched.isLoggedIn) {

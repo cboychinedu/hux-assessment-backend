@@ -141,6 +141,58 @@ router.post('/update/:id', protectedRoute, async(req, res) => {
     }
 })
 
+// Creating a route for retrivng the contact details 
+router.post('/getContacts/:id', protectedRoute, async(req, res) => {
+    // Using try catch block 
+    try {
+        // Getting the contact id 
+        const contact = await CONTACTS.findOne({
+            "_id": req.params.id, 
+        }); 
+
+        // If the contact data exists on the database, execute the 
+        // block of code below 
+        if (contact) {
+            // Creating a success message 
+            let successMessage = JSON.stringify({
+                "message": "Contacts found", 
+                "status": "success", 
+                "dataValue": contact, 
+                "statusCode": 200
+            }); 
+
+            return res.send(successMessage); 
+        }
+
+        // Else if no contact was not found, execute the block of code 
+        // below 
+        else {
+            // Creating the error message 
+            let errorMessage = JSON.stringify({
+                "message": "Contacts not found", 
+                "status": "error", 
+                "statusCode": 404
+            }); 
+
+            // Sending the error message 
+            return res.send(errorMessage); 
+        }
+    }
+
+    // Catch the error 
+    catch (error) {
+        // Creating the error message 
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(), 
+            "status": "error", 
+            "statusCode": 500, 
+        }); 
+
+        // Sending back the success message 
+        return res.send(errorMessage).status(500); 
+    }
+})
+
 
 // Creating a route for creating contacts 
 router.post('/createContact', protectedRoute, async(req, res) => {
