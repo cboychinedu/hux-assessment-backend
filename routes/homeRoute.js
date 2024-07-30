@@ -90,7 +90,7 @@ router.post('/login', async(req, res) => {
             emailAddress: req.body.emailAddress 
         }); 
 
-        // If the email address specified was not found on the database, 
+        // If the email address specified was found on the database, 
         // execute the block of code below 
         if (user) {
             // Get the user password, and the hashpassword 
@@ -141,7 +141,7 @@ router.post('/login', async(req, res) => {
  
         }
 
-        // else if the user exists, 
+        // else if the user does not exists, 
         else {
             // Create the error message 
             let errorMessage = JSON.stringify({
