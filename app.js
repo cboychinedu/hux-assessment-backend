@@ -1,6 +1,6 @@
 /**
  * Author: Engr Mbonu Chinedum E
- * Description: Shawarma Web application
+ * Description: Hux assessment backend
  * Date Create: 4/10/2023 
  * Date Modified: 4/10/2023
  */
