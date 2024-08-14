@@ -97,7 +97,7 @@ router.post('/login', async(req, res) => {
             const userPassword = req.body.password; 
             const hashedPassword = user.password; 
 
-            // Checking if the hashed value is correct
+            // Checking if the password hashed value is correct
             const isMatch = bcrypt.compareSync(userPassword, hashedPassword);
 
             // Getting the secret key 
@@ -167,6 +167,72 @@ router.post('/login', async(req, res) => {
         // Sending back the error message 
         return res.send(errorMessage); 
 
+    }
+})
+
+
+// Creating a route for the forgot password 
+router.post('/forgotPassword', async(req, res) => {
+    // Using try catch block to get the user 
+    try{
+        // Getting the user email 
+        const user = await USERS.findOne({
+            emailAddress: req.body.emailAddress
+        }); 
+
+        // Encrypt the new password and create a salt hash 
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = bcrypt.hashSync(req.body.password, salt); 
+
+        // Updating the user's password 
+        const userData = await USERS.findOneAndUpdate({
+            "emailAddress": req.body.emailAddress
+        }, {
+            $set: {
+                password: hashedPassword || user.password
+            }
+        });  
+
+        // If the user data exists on the database, execute the 
+        // block of code below 
+        if (userData) {
+            // Creating a success message 
+            let successMessage = JSON.stringify({
+                "message": "User password changed", 
+                "status": "success", 
+                "statusCode": 200, 
+            }); 
+
+            // Sending back the success message 
+            return res.send(successMessage); 
+        }
+
+        // else if the user information was not found on the 
+        // database, execute the block of code below 
+        else {
+            // Creating an error message 
+            let errorMessage = JSON.stringify({
+                "message": "User information not found", 
+                "status": "error", 
+                "statusCode": 404, 
+            }); 
+
+            // Sendng the error message 
+            return res.send(errorMessage); 
+        }
+    }
+
+    // Catch the eror 
+    catch (error) {
+        // Creating the error message 
+        let errorMessage = JSON.stringify({
+            "message": error.toString().trim(), 
+            "status": "error", 
+            "statusCode": 500, 
+        }); 
+
+        // Sending back the success message 
+        return res.send(errorMessage); 
     }
 })
 
